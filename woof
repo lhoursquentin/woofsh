@@ -1,0 +1,57 @@
+#! /bin/sh
+
+: "${1?'Missing arg'}"
+
+if [ ! -e "$1" ]; then
+  echo "Please provide a valid file or directory" >&2
+  exit 1
+fi
+
+mac="$([ "$(uname)" = 'Darwin' ] && echo true || echo false)"
+
+get_ip() {
+  if "$mac"; then
+    ipconfig getifaddr en0
+  else
+    ip route get 1 | awk '{ print $NF; exit }'
+  fi
+}
+
+get_size() {
+  if "$mac"; then
+    stat -f %z "$1"
+  else
+    stat -c %s "$1"
+  fi
+}
+
+basename="$(basename "$1")"
+
+if [ -d "$1" ]; then
+  readonly zip_name=/tmp/"$basename".zip
+  zip -r "$zip_name" "$1"
+  set -- "$zip_name"
+  basename="$basemane".zip
+fi
+
+readonly addr="$(get_ip)"
+
+if [ -z "$addr" ]; then
+  echo "No ip found" >&2
+  exit 2
+fi
+
+readonly port=8080
+printf 'Get %s on %s:%s\n' "$basename" "$addr" "$port"
+
+{
+  printf 'HTTP/1.1
+200 OK\r
+Content-Length: %s\r
+Content-Type: multipart/form-data\r
+Content-Disposition: attachment; filename="%s"\r
+\r\n' "$(get_size "$1")" "$basename"
+  cat "$1"
+} | nc -l "$port"
+
+rm -f "$zip_name"
