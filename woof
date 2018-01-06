@@ -13,7 +13,7 @@ get_ip() {
   if "$mac"; then
     ipconfig getifaddr en0
   else
-    ip route get 1 | awk '{ print $NF; exit }'
+    ip route get 1 | sed -n 's/.*src[[:space:]]\([^[:space:]]*\).*/\1/p'
   fi
 }
 
