@@ -3,7 +3,7 @@
 : "${1?'Missing arg'}"
 
 if [ ! -e "$1" ]; then
-  echo "Please provide a valid file or directory" >&2
+  echo 'Please provide a valid file or directory' >&2
   exit 1
 fi
 
@@ -29,6 +29,7 @@ basename="$(basename "$1")"
 
 if [ -d "$1" ]; then
   readonly zip_name=/tmp/"$basename".zip
+  printf 'Creating archive %s...\n' "$basename.zip"
   : "$(cd "$1"/..; zip -r "$zip_name" "$basename")"
   set -- "$zip_name"
   basename="$basename".zip
@@ -37,7 +38,7 @@ fi
 readonly addr="$(get_ip)"
 
 if [ -z "$addr" ]; then
-  echo "No ip found" >&2
+  echo 'No ip found' >&2
   exit 2
 fi
 
