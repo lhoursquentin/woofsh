@@ -46,12 +46,12 @@ readonly port=8080
 printf 'Get %s on %s:%s\n' "$basename" "$addr" "$port"
 
 {
-  printf 'HTTP/1.1
-200 OK\r
+  printf 'HTTP/1.1 200 OK\r
 Content-Length: %s\r
 Content-Type: multipart/form-data\r
 Content-Disposition: attachment; filename="%s"\r
-\r\n' "$(get_size "$1")" "$basename"
+\r
+' "$(get_size "$1")" "$basename"
   cat "$1"
 } | nc -l "$port"
 
