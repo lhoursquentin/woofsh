@@ -53,6 +53,6 @@ Content-Disposition: attachment; filename="%s"\r
 \r
 ' "$(get_size "$1")" "$basename"
   cat "$1"
-} | nc -l "$port"
+} | nc -l -p "$port"
 
 rm -f "$zip_name"
